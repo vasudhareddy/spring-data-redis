@@ -1,11 +1,13 @@
 package com.vasudha.springdataredis.config;
 
+import com.vasudha.springdataredis.model.*;
 import org.apache.commons.pool2.impl.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.context.annotation.*;
 import org.springframework.data.redis.connection.*;
 import org.springframework.data.redis.connection.jedis.*;
 import org.springframework.data.redis.core.*;
+import org.springframework.data.redis.serializer.*;
 import org.springframework.util.*;
 
 @Configuration
@@ -56,6 +58,24 @@ public class RedisConfig {
         //template.setValueSerializer(jackson2JsonRedisSerializer);
         RedisTemplate<String,Object> redisTemplate = new RedisTemplate<String,Object>();
         redisTemplate.setConnectionFactory(getJedisConnectionFactory());
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
         return redisTemplate;
+    }
+
+    @Bean
+    @Qualifier("listOperations")
+    public ListOperations<String, Programmer> listOperations(RedisTemplate<String,Programmer> redisTemplate) {
+        return redisTemplate.opsForList();
+    }
+    @Bean
+    @Qualifier("setOperations")
+    public SetOperations<String, Programmer> setOperations(RedisTemplate<String,Programmer> redisTemplate) {
+        return redisTemplate.opsForSet();
+    }
+
+    @Bean
+    @Qualifier("hashOperations")
+    public HashOperations<String, Integer, Programmer> hashOperations(RedisTemplate<String,Programmer> redisTemplate) {
+        return redisTemplate.opsForHash();
     }
 }
